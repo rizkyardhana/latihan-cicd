@@ -1,0 +1,40 @@
+name: Deploy
+run-name: ${{ github.event_name == 'workflow_dispatch' && format('Rollback ke {0}', inputs.version) || format('Rilis {0}', github.ref_name) }}
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Tag versi yang akan dipulihkan
+        required: true
+        type: string
+        default: v2.0.0
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout versi yang dipilih
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref }}
+
+      - name: Siapkan Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Validasi sintaks aplikasi
+        run: python -m compileall -q app.py
+
+      - name: Simulasikan deployment
+        env:
+          DEPLOY_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+        run: echo "Simulasi deploy versi ${DEPLOY_REF} berhasil."
