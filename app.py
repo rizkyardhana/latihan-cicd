@@ -1,6 +1,6 @@
 VERSION = "1.0"
 STATUS = "Stable"
-MESSAGE = "Error: konfigurasi salah!
+MESSAGE = "Hello World!"
 
 def run():
     print(f"Version : {VERSION}")
